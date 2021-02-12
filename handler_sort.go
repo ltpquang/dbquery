@@ -1,8 +1,8 @@
 package dbquery
 
 import (
-	"fmt"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type sortHandler struct{}
@@ -21,6 +21,8 @@ func (*sortHandler) Apply(db *gorm.DB, value interface{}) (*gorm.DB, error) {
 	if !ok {
 		return nil, ErrCastingError
 	}
-	sortStr := fmt.Sprintf("`%s` %s", queryObject.key, order)
-	return db.Order(sortStr), nil
+	return db.Order(clause.OrderByColumn{
+			Column: clause.Column{Name: queryObject.key},
+			Desc:   order == OrderDesc}),
+		nil
 }
